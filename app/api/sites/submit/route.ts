@@ -1,5 +1,6 @@
 import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
+import { getMPlaceUser } from "../../../../lib/auth/session";
 import { adminDb } from "../../../../lib/firebase/admin";
 import { isPermittedCrawlUrl } from "../../../../lib/safety";
 
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
 
   const url = normalizeSiteUrl(submittedUrl);
   const hostname = new URL(url).hostname.toLowerCase();
+  const user = await getMPlaceUser();
 
   const existing = await adminDb
     .collection("siteSubmissions")
@@ -44,6 +46,7 @@ export async function POST(request: NextRequest) {
     hostname,
     status: "queued",
     source: "public-submit",
+    submitterUid: user?.uid ?? null,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
   });
