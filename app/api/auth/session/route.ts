@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { adminAuth } from "../../../../lib/firebase/admin";
+import { adminAuth } from "../../../../lib/firebase/auth-admin";
 
 const SESSION_COOKIE = "mplace_session";
 const FIVE_DAYS = 60 * 60 * 24 * 5;
