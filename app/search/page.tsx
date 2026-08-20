@@ -1,21 +1,8 @@
+import { searchIndex } from "../../lib/search-index";
+
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
 };
-
-const demoResults = [
-  {
-    url: "https://mplace.cc",
-    domain: "mplace.cc",
-    title: "MPlace",
-    snippet: "Create, discover and explore places across the MPlace ecosystem.",
-  },
-  {
-    url: "https://pages.mplace.cc",
-    domain: "pages.mplace.cc",
-    title: "MPlace Pages",
-    snippet: "Make your own place on the internet and share it with others.",
-  },
-];
 
 function SearchIcon() {
   return (
@@ -25,9 +12,12 @@ function SearchIcon() {
   );
 }
 
+export const dynamic = "force-dynamic";
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const { q = "" } = await searchParams;
   const query = q.trim();
+  const results = query ? await searchIndex(query).catch(() => []) : [];
 
   return (
     <main className="results-shell">
@@ -54,23 +44,28 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       <section className="results-content">
         {!query ? (
           <p className="notice">Enter something to search.</p>
-        ) : (
+        ) : results.length ? (
           <>
-            <p className="results-meta">Beta results for <strong>{query}</strong></p>
+            <p className="results-meta">{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
             <div className="results-list">
-              {demoResults.map((result) => (
+              {results.map((result) => (
                 <article className="result" key={result.url}>
                   <a className="result-source" href={result.url}>
                     <span className="result-favicon">{result.domain.charAt(0).toUpperCase()}</span>
                     <span><strong>{result.domain}</strong><small>{result.url}</small></span>
                   </a>
                   <a className="result-title" href={result.url}>{result.title}</a>
-                  <p className="result-snippet">{result.snippet}</p>
+                  {result.snippet && <p className="result-snippet">{result.snippet}</p>}
                 </article>
               ))}
             </div>
-            <p className="beta-explainer">These are demo results while the live MPlace crawler and index are being connected.</p>
           </>
+        ) : (
+          <div className="empty-results">
+            <p>No indexed pages matched <strong>{query}</strong>.</p>
+            <p className="notice">MPlace Search only searches sites that have been submitted and crawled. You can add a website to the index.</p>
+            <a className="header-submit-link" href="/submit">Add a website</a>
+          </div>
         )}
       </section>
     </main>
