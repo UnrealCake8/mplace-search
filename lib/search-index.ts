@@ -38,18 +38,18 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
   const terms = tokenize(query);
   if (!terms.length) return [];
 
-  // Firestore has no native full-text search. For this MVP we use the most
-  // distinctive query token as the candidate lookup, then rank candidates in memory.
+  // Firestore has no native full-text search. For the MVP we use one distinctive
+  // token to retrieve candidates, then rank every candidate in memory.
   const lookupTerm = [...terms].sort((a, b) => b.length - a.length)[0];
   const snapshot = await adminDb
     .collection("indexedPages")
-    .where("searchable", "==", true)
     .where("terms", "array-contains", lookupTerm)
-    .limit(50)
+    .limit(75)
     .get();
 
-  const results = snapshot.docs.map((doc) => {
+  const results = snapshot.docs.flatMap((doc) => {
     const data = doc.data() as {
+      searchable?: boolean;
       url?: string;
       canonicalUrl?: string;
       hostname?: string;
@@ -58,6 +58,8 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
       text?: string;
       headings?: string;
     };
+
+    if (data.searchable !== true) return [];
 
     const title = data.title || data.hostname || "Untitled";
     const description = data.description || "";
@@ -82,13 +84,13 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
       score += Math.min(countOccurrences(textLower, term), 8);
     }
 
-    return {
+    return [{
       url,
       domain,
       title,
       snippet: makeSnippet(text, description, terms),
       score,
-    };
+    }];
   });
 
   return results
