@@ -5,9 +5,12 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 function authorized(request: NextRequest) {
-  const secret = process.env.CRAWLER_SECRET || process.env.CRON_SECRET;
-  if (!secret) return process.env.NODE_ENV !== "production";
-  return request.headers.get("authorization") === `Bearer ${secret}`;
+  const auth = request.headers.get("authorization");
+  const allowed = [process.env.CRAWLER_SECRET, process.env.CRON_SECRET]
+    .filter((value): value is string => Boolean(value));
+
+  if (!allowed.length) return process.env.NODE_ENV !== "production";
+  return allowed.some((secret) => auth === `Bearer ${secret}`);
 }
 
 async function run(request: NextRequest) {
