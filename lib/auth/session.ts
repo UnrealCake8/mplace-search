@@ -1,5 +1,5 @@
 import { cookies } from "next/headers";
-import { adminAuth } from "../firebase/admin";
+import { adminAuth } from "../firebase/auth-admin";
 
 const SESSION_COOKIE = "mplace_session";
 
