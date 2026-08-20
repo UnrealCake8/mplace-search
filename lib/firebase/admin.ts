@@ -1,5 +1,4 @@
 import { applicationDefault, cert, getApps, initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 
 function privateKey() {
@@ -14,7 +13,5 @@ const credential = projectId && clientEmail && key
   ? cert({ projectId, clientEmail, privateKey: key })
   : applicationDefault();
 
-const app = getApps()[0] ?? initializeApp({ credential, projectId });
-
-export const adminAuth = getAuth(app);
-export const adminDb = getFirestore(app);
+export const adminApp = getApps()[0] ?? initializeApp({ credential, projectId });
+export const adminDb = getFirestore(adminApp);
