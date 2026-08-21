@@ -1,11 +1,15 @@
 import { adminDb } from "./firebase/admin";
 
 export type SearchResult = {
+  id: string;
+  kind: "web" | "business";
   url: string;
   domain: string;
   title: string;
   snippet: string;
   score: number;
+  address?: string;
+  category?: string;
 };
 
 function tokenize(value: string) {
@@ -38,16 +42,14 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
   const terms = tokenize(query);
   if (!terms.length) return [];
 
-  // Firestore has no native full-text search. For the MVP we use one distinctive
-  // token to retrieve candidates, then rank every candidate in memory.
   const lookupTerm = [...terms].sort((a, b) => b.length - a.length)[0];
-  const snapshot = await adminDb
-    .collection("indexedPages")
-    .where("terms", "array-contains", lookupTerm)
-    .limit(75)
-    .get();
 
-  const results = snapshot.docs.flatMap((doc) => {
+  const [pageSnapshot, businessSnapshot] = await Promise.all([
+    adminDb.collection("indexedPages").where("terms", "array-contains", lookupTerm).limit(75).get(),
+    adminDb.collection("businesses").where("searchTerms", "array-contains", lookupTerm).limit(50).get(),
+  ]);
+
+  const webResults = pageSnapshot.docs.flatMap((doc) => {
     const data = doc.data() as {
       searchable?: boolean;
       url?: string;
@@ -84,17 +86,44 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
       score += Math.min(countOccurrences(textLower, term), 8);
     }
 
-    return [{
-      url,
-      domain,
-      title,
-      snippet: makeSnippet(text, description, terms),
-      score,
-    }];
+    return [{ id: `web:${doc.id}`, kind: "web" as const, url, domain, title, snippet: makeSnippet(text, description, terms), score }];
   });
 
-  return results
-    .filter((result) => result.url)
+  const businessResults = businessSnapshot.docs.flatMap((doc) => {
+    const data = doc.data() as {
+      searchable?: boolean;
+      status?: string;
+      name?: string;
+      category?: string;
+      address?: string;
+      city?: string;
+      country?: string;
+      website?: string | null;
+      description?: string | null;
+    };
+
+    if (data.searchable !== true || data.status !== "approved") return [];
+
+    const title = data.name || "Untitled business";
+    const category = data.category || "Business";
+    const address = [data.address, data.city, data.country].filter(Boolean).join(", ");
+    const description = data.description || `${category}${address ? ` in ${address}` : ""}`;
+    const searchableText = `${title} ${category} ${address} ${description}`.toLowerCase();
+    let score = 12;
+    for (const term of terms) {
+      if (title.toLowerCase() === query.toLowerCase()) score += 40;
+      score += Math.min(countOccurrences(title.toLowerCase(), term), 3) * 12;
+      score += Math.min(countOccurrences(category.toLowerCase(), term), 3) * 6;
+      score += Math.min(countOccurrences(searchableText, term), 6) * 2;
+    }
+
+    const url = data.website || "";
+    const domain = url ? new URL(url).hostname : "MPlace Places";
+    return [{ id: `business:${doc.id}`, kind: "business" as const, url, domain, title, snippet: description, score, address, category }];
+  });
+
+  return [...businessResults, ...webResults]
+    .filter((result) => result.kind === "business" || result.url)
     .sort((a, b) => b.score - a.score)
     .slice(0, 20);
 }
