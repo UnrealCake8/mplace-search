@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { MPlaceBrand } from "../components/MPlaceBrand";
 
 function SearchIcon() {
   return (
@@ -24,20 +25,18 @@ export default function HomePage() {
     <main className="home-shell">
       <header className="topbar">
         <nav className="topbar-left" aria-label="MPlace products">
-          <a href="https://maps.mplace.cc">Maps</a>
+          <a href="/business/add">Places</a>
           <a href="https://pages.mplace.cc">Pages</a>
         </nav>
         <nav className="topbar-right" aria-label="MPlace Search links">
           <a href="/submit">Add a website</a>
-          <a href="/safety">Safety</a>
+          <a href="/business/add">Add a business</a>
+          <a className="id-pill" href="/id">MPlace ID</a>
         </nav>
       </header>
 
       <section className="search-home" aria-labelledby="mplace-title">
-        <a className="mplace-wordmark" href="/" id="mplace-title" aria-label="MPlace Search home">
-          <span className="wordmark-symbol">M</span><span>Place</span>
-        </a>
-        <p className="home-product-name">Search</p>
+        <a className="home-brand" href="/" id="mplace-title"><MPlaceBrand product="Search" /></a>
 
         <form className="home-search-form" onSubmit={submit} role="search">
           <SearchIcon />
@@ -45,7 +44,7 @@ export default function HomePage() {
             aria-label="Search MPlace"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search the web"
+            placeholder="Search MPlace"
             autoFocus
             autoComplete="off"
           />
@@ -53,20 +52,18 @@ export default function HomePage() {
         </form>
 
         <div className="home-actions">
-          <button type="button" onClick={() => document.querySelector<HTMLInputElement>(".home-search-form input")?.focus()}>
-            MPlace Search
-          </button>
           <a href="/submit">Add your website</a>
+          <a href="/business/add">Add your business</a>
         </div>
 
-        <p className="home-note">A growing index of submitted websites, with safety filtering built in for everyone.</p>
+        <p className="home-note">A growing, safety-first index of websites and places. No AI summaries, no adult-mode switch.</p>
       </section>
 
       <footer className="home-footer">
         <div>MPlace Search Beta</div>
         <nav aria-label="Footer links">
-          <a href="/submit">Submit</a>
           <a href="/safety">Safety</a>
+          <a href="/id">MPlace ID</a>
           <a href="https://mplace.cc">MPlace</a>
         </nav>
       </footer>

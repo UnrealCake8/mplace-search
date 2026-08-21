@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { MPlaceBrand } from "../../components/MPlaceBrand";
 
 export default function SubmitPage() {
   const [url, setUrl] = useState("");
@@ -17,7 +18,6 @@ export default function SubmitPage() {
 
     setSubmitting(true);
     setMessage("");
-
     try {
       const response = await fetch("/api/sites/submit", {
         method: "POST",
@@ -36,15 +36,15 @@ export default function SubmitPage() {
 
   return (
     <main className="page-shell">
-      <header><a className="brand-small" href="/">MPlace Search</a><a href="/safety">Safety</a></header>
+      <header><a href="/"><MPlaceBrand compact product="Search" /></a><nav className="results-account-nav"><a href="/business/add">Add a business</a><a className="id-pill" href="/id">MPlace ID</a></nav></header>
       <div className="stack">
         <div>
-          <h1 style={{fontSize: "42px"}}>Add a website</h1>
-          <p className="notice">Submit a public website for consideration. MPlace will only index pages that pass its safety, spam and crawler rules.</p>
+          <p className="eyebrow">MPlace Search</p>
+          <h1 className="page-title">Add a website</h1>
+          <p className="notice">Submit a public website for consideration. MPlace only indexes pages that pass its safety, spam and crawler rules.</p>
         </div>
         <form className="card stack" onSubmit={submit}>
-          <div className="stack" style={{gap: "8px"}}>
-            <label htmlFor="site-url">Website address</label>
+          <label htmlFor="site-url">Website address
             <input
               id="site-url"
               value={url}
@@ -54,12 +54,11 @@ export default function SubmitPage() {
               autoComplete="url"
               disabled={submitting}
             />
-          </div>
-          <button className="primary" type="submit" disabled={submitting}>
-            {submitting ? "Submitting…" : "Submit website"}
-          </button>
+          </label>
+          <button className="primary" type="submit" disabled={submitting}>{submitting ? "Submitting…" : "Submit website"}</button>
           {message && <p className="notice" role="status">{message}</p>}
         </form>
+        <p className="notice">Want to add a physical place instead? <a className="inline-link" href="/business/add">Add your business to MPlace Places.</a></p>
       </div>
     </main>
   );
