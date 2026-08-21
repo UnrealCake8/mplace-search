@@ -33,7 +33,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
       <div className="results-nav-wrap">
         <nav className="results-nav" aria-label="Search categories">
-          <a className="active" href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>Web</a>
+          <a className="active" href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>All</a>
           <span aria-disabled="true">Images <small>Soon</small></span>
           <a href="/business/add">Places</a>
           <span aria-disabled="true">Pages <small>Soon</small></span>
@@ -47,8 +47,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <>
             <p className="results-meta">{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
             <div className="results-list">
-              {results.map((result) => (
-                <article className="result" key={result.url}>
+              {results.map((result) => result.kind === "business" ? (
+                <article className="result place-result" key={result.id}>
+                  <div className="place-result-label">MPlace Places</div>
+                  <div className="result-source">
+                    <span className="result-favicon">{result.title.charAt(0).toUpperCase()}</span>
+                    <span><strong>{result.title}</strong><small>{result.category}{result.address ? ` · ${result.address}` : ""}</small></span>
+                  </div>
+                  {result.url ? <a className="result-title" href={result.url}>{result.title}</a> : <div className="result-title result-title-static">{result.title}</div>}
+                  {result.snippet && <p className="result-snippet">{result.snippet}</p>}
+                  {result.url && <a className="place-website-link" href={result.url}>Visit website</a>}
+                </article>
+              ) : (
+                <article className="result" key={result.id}>
                   <a className="result-source" href={result.url}>
                     <span className="result-favicon">{result.domain.charAt(0).toUpperCase()}</span>
                     <span><strong>{result.domain}</strong><small>{result.url}</small></span>
@@ -61,8 +72,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </>
         ) : (
           <div className="empty-results">
-            <p>No indexed pages matched <strong>{query}</strong>.</p>
-            <p className="notice">MPlace Search only searches sites that have been submitted and crawled.</p>
+            <p>No indexed pages or places matched <strong>{query}</strong>.</p>
+            <p className="notice">MPlace Search searches crawled websites and approved MPlace Places listings.</p>
             <div className="empty-actions"><a href="/submit">Add a website</a><a href="/business/add">Add a business</a></div>
           </div>
         )}
