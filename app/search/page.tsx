@@ -1,4 +1,5 @@
 import { MAdsLink } from "../../components/MAdsLink";
+import { MPlaceApps } from "../../components/MPlaceApps";
 import { MPlaceBrand } from "../../components/MPlaceBrand";
 import { searchIndex } from "../../lib/search-index";
 import styles from "./search.module.css";
@@ -57,6 +58,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </form>
         <nav className={styles.accountNav}>
           <a href="/business/add">Business</a>
+          <MPlaceApps compact />
           <a href="/id" className={styles.idButton}>MPlace ID</a>
         </nav>
       </header>
@@ -66,7 +68,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <a className={styles.active} href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>All</a>
           <span>Images <small>Soon</small></span>
           <a href="/business/add">Places</a>
-          <span>Pages <small>Soon</small></span>
+          <a href="https://pages.mplace.cc">Pages</a>
+          <a href="https://videos.mplace.cc">Videos</a>
         </nav>
       </div>
 
