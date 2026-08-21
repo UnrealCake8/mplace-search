@@ -1,5 +1,6 @@
 import { MPlaceBrand } from "../../components/MPlaceBrand";
 import { searchIndex } from "../../lib/search-index";
+import styles from "./search.module.css";
 
 type SearchPageProps = {
   searchParams: Promise<{ q?: string }>;
@@ -13,6 +14,14 @@ function SearchIcon() {
   );
 }
 
+function osmUrl(result: { latitude?: number; longitude?: number; address?: string; title: string }) {
+  if (typeof result.latitude === "number" && typeof result.longitude === "number") {
+    return `https://www.openstreetmap.org/?mlat=${result.latitude}&mlon=${result.longitude}#map=17/${result.latitude}/${result.longitude}`;
+  }
+  const search = [result.title, result.address].filter(Boolean).join(" ");
+  return `https://www.openstreetmap.org/search?query=${encodeURIComponent(search)}`;
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -21,60 +30,69 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const results = query ? await searchIndex(query).catch(() => []) : [];
 
   return (
-    <main className="results-shell">
-      <header className="results-header">
-        <a className="results-brand" href="/" aria-label="MPlace Search home"><MPlaceBrand compact product="Search" /></a>
-        <form className="results-search-form" action="/search" method="get" role="search">
+    <main className={styles.shell}>
+      <header className={styles.header}>
+        <a className={styles.brand} href="/" aria-label="MPlace Search home">
+          <MPlaceBrand compact product="Search" />
+        </a>
+        <form className={styles.searchForm} action="/search" method="get" role="search">
           <input name="q" defaultValue={query} aria-label="Search MPlace" placeholder="Search MPlace" autoComplete="off" />
           <button type="submit" aria-label="Search"><SearchIcon /></button>
         </form>
-        <nav className="results-account-nav"><a href="/business/add">Business</a><a href="/id" className="id-pill">MPlace ID</a></nav>
+        <nav className={styles.accountNav}>
+          <a href="/business/add">Business</a>
+          <a href="/id" className={styles.idButton}>MPlace ID</a>
+        </nav>
       </header>
 
-      <div className="results-nav-wrap">
-        <nav className="results-nav" aria-label="Search categories">
-          <a className="active" href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>All</a>
-          <span aria-disabled="true">Images <small>Soon</small></span>
+      <div className={styles.tabsWrap}>
+        <nav className={styles.tabs} aria-label="Search categories">
+          <a className={styles.active} href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>All</a>
+          <span>Images <small>Soon</small></span>
           <a href="/business/add">Places</a>
-          <span aria-disabled="true">Pages <small>Soon</small></span>
+          <span>Pages <small>Soon</small></span>
         </nav>
       </div>
 
-      <section className="results-content">
+      <section className={styles.content}>
         {!query ? (
-          <p className="notice">Enter something to search.</p>
+          <p className={styles.muted}>Enter something to search.</p>
         ) : results.length ? (
           <>
-            <p className="results-meta">{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
-            <div className="results-list">
+            <p className={styles.meta}>{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
+            <div className={styles.resultsList}>
               {results.map((result) => result.kind === "business" ? (
-                <article className="result place-result" key={result.id}>
-                  <div className="place-result-label">MPlace Places</div>
-                  <div className="result-source">
-                    <span className="result-favicon">{result.title.charAt(0).toUpperCase()}</span>
-                    <span><strong>{result.title}</strong><small>{result.category}{result.address ? ` · ${result.address}` : ""}</small></span>
+                <article className={styles.result} key={result.id}>
+                  <div className={styles.sourceRow}>
+                    <span className={styles.placeIcon}>{result.title.charAt(0).toUpperCase()}</span>
+                    <div>
+                      <strong>{result.title}</strong>
+                      <small>{result.category || "Business"}{result.address ? ` · ${result.address}` : ""}</small>
+                    </div>
                   </div>
-                  {result.url ? <a className="result-title" href={result.url}>{result.title}</a> : <div className="result-title result-title-static">{result.title}</div>}
-                  {result.snippet && <p className="result-snippet">{result.snippet}</p>}
-                  {result.url && <a className="place-website-link" href={result.url}>Visit website</a>}
+                  <a className={styles.title} href={result.url}>{result.title}</a>
+                  {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
+                  <div className={styles.placeActions}>
+                    <a href={result.url}>Place details</a>
+                    <a href={osmUrl(result)} target="_blank" rel="noreferrer">OpenStreetMap</a>
+                  </div>
                 </article>
               ) : (
-                <article className="result" key={result.id}>
-                  <a className="result-source" href={result.url}>
-                    <span className="result-favicon">{result.domain.charAt(0).toUpperCase()}</span>
-                    <span><strong>{result.domain}</strong><small>{result.url}</small></span>
+                <article className={styles.result} key={result.id}>
+                  <a className={styles.sourceRow} href={result.url}>
+                    <span className={styles.webIcon}>{result.domain.charAt(0).toUpperCase()}</span>
+                    <div><strong>{result.domain}</strong><small>{result.url}</small></div>
                   </a>
-                  <a className="result-title" href={result.url}>{result.title}</a>
-                  {result.snippet && <p className="result-snippet">{result.snippet}</p>}
+                  <a className={styles.title} href={result.url}>{result.title}</a>
+                  {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
                 </article>
               ))}
             </div>
           </>
         ) : (
-          <div className="empty-results">
+          <div>
             <p>No indexed pages or places matched <strong>{query}</strong>.</p>
-            <p className="notice">MPlace Search searches crawled websites and approved MPlace Places listings.</p>
-            <div className="empty-actions"><a href="/submit">Add a website</a><a href="/business/add">Add a business</a></div>
+            <p className={styles.muted}>MPlace Search searches crawled websites and approved MPlace Places listings.</p>
           </div>
         )}
       </section>
