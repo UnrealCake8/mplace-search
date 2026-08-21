@@ -16,6 +16,11 @@
     "react": "19.1.1",
     "react-dom": "19.1.1"
   },
+  "overrides": {
+    "jwks-rsa": {
+      "jose": "4.15.9"
+    }
+  },
   "devDependencies": {
     "@types/node": "24.3.0",
     "@types/react": "19.1.10",
