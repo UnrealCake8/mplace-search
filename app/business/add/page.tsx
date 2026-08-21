@@ -9,9 +9,10 @@ export default function AddBusinessPage() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const formElement = event.currentTarget;
     setBusy(true);
     setMessage("");
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     const latitudeText = String(form.get("latitude") || "").trim();
     const longitudeText = String(form.get("longitude") || "").trim();
     const payload = {
@@ -29,7 +30,7 @@ export default function AddBusinessPage() {
       }
       if (!response.ok) throw new Error(data.error || "Could not submit business.");
       setMessage(data.message || "Business submitted.");
-      event.currentTarget.reset();
+      formElement.reset();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Could not submit business.");
     } finally {
