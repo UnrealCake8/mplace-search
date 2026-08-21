@@ -10,6 +10,8 @@ export type SearchResult = {
   score: number;
   address?: string;
   category?: string;
+  latitude?: number;
+  longitude?: number;
 };
 
 function tokenize(value: string) {
@@ -46,8 +48,6 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
 
   const [pageSnapshot, businessSnapshot] = await Promise.all([
     adminDb.collection("indexedPages").where("terms", "array-contains", lookupTerm).limit(75).get(),
-    // The business collection is still small, so scan approved candidates in memory.
-    // This also makes older listings searchable even if their searchTerms field was incomplete.
     adminDb.collection("businesses").where("searchable", "==", true).limit(200).get(),
   ]);
 
@@ -102,6 +102,7 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
       country?: string;
       website?: string | null;
       description?: string | null;
+      location?: { latitude?: number; longitude?: number } | null;
     };
 
     if (data.searchable !== true || data.status !== "approved") return [];
@@ -109,10 +110,9 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
     const title = data.name || "Untitled business";
     const category = data.category || "Business";
     const address = [data.address, data.city, data.country].filter(Boolean).join(", ");
-    const description = data.description || `${category}${address ? ` in ${address}` : ""}`;
+    const description = data.description || "";
     const searchableText = `${title} ${category} ${address} ${description}`.toLowerCase();
 
-    // Require at least one query term to match the actual business data.
     if (!terms.some((term) => searchableText.includes(term))) return [];
 
     let score = 12;
@@ -124,17 +124,18 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
     }
 
     const website = data.website || "";
-    const domain = website ? new URL(website).hostname : "MPlace Places";
     return [{
       id: `business:${doc.id}`,
       kind: "business" as const,
-      url: website || `/places/${doc.id}`,
-      domain,
+      url: `/places/${doc.id}`,
+      domain: website ? new URL(website).hostname : "MPlace Places",
       title,
       snippet: description,
       score,
       address,
       category,
+      latitude: typeof data.location?.latitude === "number" ? data.location.latitude : undefined,
+      longitude: typeof data.location?.longitude === "number" ? data.location.longitude : undefined,
     }];
   });
 
