@@ -3,14 +3,19 @@
 import { FormEvent, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
 import { firebaseAuth } from "../../lib/firebase/client";
 import { MPlaceApps } from "../../components/MPlaceApps";
 import { MPlaceBrand } from "../../components/MPlaceBrand";
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: "select_account" });
 
 async function establishSession(user: User) {
   const idToken = await user.getIdToken();
@@ -49,6 +54,19 @@ export default function MPlaceIdPage() {
       await finish(credential.user);
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Sign in failed.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function signInWithGoogle() {
+    setBusy(true);
+    setMessage("");
+    try {
+      const credential = await signInWithPopup(firebaseAuth, googleProvider);
+      await finish(credential.user);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Google sign in failed.");
     } finally {
       setBusy(false);
     }
@@ -111,6 +129,15 @@ export default function MPlaceIdPage() {
               </>
             ) : (
               <>
+                <button
+                  type="button"
+                  className="account-secondary-button"
+                  onClick={signInWithGoogle}
+                  disabled={busy}
+                >
+                  Continue with Google
+                </button>
+                <div className="account-divider" role="separator"><span>or</span></div>
                 <form className="account-form" onSubmit={submit}>
                   <label>
                     <span>Email</span>
