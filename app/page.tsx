@@ -28,6 +28,7 @@ export default function HomePage() {
         <nav className={styles.nav} aria-label="MPlace products">
           <a href="/business/add">Places</a>
           <a href="https://pages.mplace.cc">Pages</a>
+          <a href="https://ads.mplace.cc">Ads</a>
         </nav>
         <nav className={styles.nav} aria-label="MPlace Search links">
           <a href="/submit">Add a website</a>
@@ -63,17 +64,17 @@ export default function HomePage() {
       </section>
 
       <footer className={styles.footer}>
-        <div className={styles.footerTop}>MPlace Search Beta</div>
+        <div className={styles.footerTop}>MPlace Search · Part of the MPlace family</div>
         <div className={styles.footerBottom}>
           <nav aria-label="Footer product links">
             <a href="/business/add">Places</a>
-            <a href="/submit">Websites</a>
-            <a href="/safety">How Search works</a>
+            <a href="https://pages.mplace.cc">MPlace Pages</a>
+            <a href="https://ads.mplace.cc">MPlace Ads</a>
           </nav>
           <nav aria-label="Footer account links">
             <a href="/safety">Safety</a>
             <a href="/id">MPlace ID</a>
-            <a href="https://mplace.cc">MPlace</a>
+            <a href="/submit">Add a website</a>
           </nav>
         </div>
       </footer>

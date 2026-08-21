@@ -5,7 +5,8 @@ import "./search-refresh.css";
 
 export const metadata: Metadata = {
   title: "MPlace Search",
-  description: "Search the web with MPlace.",
+  description: "MPlace Search is the safety-first search engine in the MPlace family, with no AI summaries and no adult-mode switch.",
+  applicationName: "MPlace Search",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
