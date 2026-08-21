@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { MAdsLink } from "../../../components/MAdsLink";
 import { MPlaceBrand } from "../../../components/MPlaceBrand";
 import { adminDb } from "../../../lib/firebase/admin";
 import styles from "./place.module.css";
@@ -62,7 +63,17 @@ export default async function PlacePage({ params }: PlacePageProps) {
           {data.description && <p className={styles.description}>{data.description}</p>}
 
           <div className={styles.actions}>
-            {data.website && <a className={styles.primary} href={data.website} target="_blank" rel="noreferrer">Website</a>}
+            {data.website && (
+              <MAdsLink
+                className={styles.primary}
+                href={data.website}
+                placement="place-website-click"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Website
+              </MAdsLink>
+            )}
             {data.phone && <a className={styles.secondary} href={`tel:${data.phone}`}>Call</a>}
             <a className={styles.secondary} href={mapUrl} target="_blank" rel="noreferrer">OpenStreetMap</a>
           </div>
