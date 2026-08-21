@@ -58,7 +58,7 @@ export default function AdminReviewPage() {
     <main className="admin-shell">
       <header className="admin-header">
         <a href="/"><MPlaceBrand compact product="Admin" /></a>
-        <div className="admin-header-links"><a href="/id">MPlace ID</a><a href="/">Search</a></div>
+        <div className="admin-header-links"><a href="/admin/index">Manual index</a><a href="/id">MPlace ID</a><a href="/">Search</a></div>
       </header>
 
       <section className="admin-hero">
