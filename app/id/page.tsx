@@ -9,6 +9,7 @@ import {
   type User,
 } from "firebase/auth";
 import { firebaseAuth } from "../../lib/firebase/client";
+import { MPlaceApps } from "../../components/MPlaceApps";
 import { MPlaceBrand } from "../../components/MPlaceBrand";
 
 async function establishSession(user: User) {
@@ -61,35 +62,89 @@ export default function MPlaceIdPage() {
   }
 
   return (
-    <main className="identity-page">
-      <a href="/" className="identity-brand"><MPlaceBrand product="ID" /></a>
-      <section className="identity-card">
-        {user ? (
-          <>
-            <p className="eyebrow">MPlace ID</p>
-            <h1>You're signed in.</h1>
-            <p className="notice">{user.email || "MPlace member"}</p>
-            <div className="identity-actions">
-              <a className="primary-link" href="/business/add">Add a business</a>
-              <a className="secondary-link" href="/submit">Add a website</a>
-              <button className="secondary-button" onClick={logout}>Sign out</button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="eyebrow">One account for MPlace</p>
-            <h1>{mode === "signin" ? "Sign in" : "Create your MPlace ID"}</h1>
-            <p className="notice">Use your email and password to access MPlace ID. Searching stays account-free.</p>
-            <form className="stack" onSubmit={submit}>
-              <label>Email<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></label>
-              <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required autoComplete={mode === "signin" ? "current-password" : "new-password"} /></label>
-              <button className="primary" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create ID"}</button>
-            </form>
-            <button className="text-button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>{mode === "signin" ? "New to MPlace? Create an ID" : "Already have an ID? Sign in"}</button>
-          </>
-        )}
-        {message && <p className="notice" role="status">{message}</p>}
+    <main className="account-page">
+      <header className="account-topbar">
+        <a href="/" className="account-brand" aria-label="MPlace home">
+          <MPlaceBrand compact product="ID" />
+        </a>
+        <div className="account-top-actions">
+          <a href="/">Search</a>
+          <MPlaceApps compact />
+        </div>
+      </header>
+
+      <section className="account-stage">
+        <div className="account-card">
+          <div className="account-intro">
+            <MPlaceBrand product="ID" />
+            {user ? (
+              <>
+                <h1>Your MPlace ID</h1>
+                <p>One account for MPlace products and the things you create across them.</p>
+              </>
+            ) : (
+              <>
+                <h1>{mode === "signin" ? "Sign in" : "Create your MPlace ID"}</h1>
+                <p>{mode === "signin" ? "Use your MPlace ID to continue to MPlace products." : "Create one account for the MPlace family."}</p>
+              </>
+            )}
+          </div>
+
+          <div className="account-panel">
+            {user ? (
+              <>
+                <div className="account-user">
+                  <div className="account-avatar">{(user.email || "M").charAt(0).toUpperCase()}</div>
+                  <div>
+                    <strong>{user.email || "MPlace member"}</strong>
+                    <span>MPlace ID</span>
+                  </div>
+                </div>
+                <div className="account-links">
+                  <a href="https://pages.mplace.cc">MPlace Pages</a>
+                  <a href="https://videos.mplace.cc">MVideo</a>
+                  <a href="https://study.mplace.cc">MStudy</a>
+                  <a href="https://ads.mplace.cc">M.Ads</a>
+                  <a href="/business/add">Manage Places</a>
+                </div>
+                <button className="account-secondary-button" onClick={logout}>Sign out</button>
+              </>
+            ) : (
+              <>
+                <form className="account-form" onSubmit={submit}>
+                  <label>
+                    <span>Email</span>
+                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" />
+                  </label>
+                  <label>
+                    <span>Password</span>
+                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required autoComplete={mode === "signin" ? "current-password" : "new-password"} />
+                  </label>
+                  <div className="account-form-actions">
+                    <button type="button" className="account-text-button" onClick={() => { setMode(mode === "signin" ? "signup" : "signin"); setMessage(""); }}>
+                      {mode === "signin" ? "Create account" : "Sign in instead"}
+                    </button>
+                    <button className="account-primary-button" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Next" : "Create ID"}</button>
+                  </div>
+                </form>
+                <p className="account-help">Searching MPlace does not require an account.</p>
+              </>
+            )}
+            {message && <p className="account-message" role="status">{message}</p>}
+          </div>
+        </div>
       </section>
+
+      <footer className="account-footer">
+        <span>MPlace ID</span>
+        <nav>
+          <a href="/safety">Safety</a>
+          <a href="https://pages.mplace.cc">Pages</a>
+          <a href="https://videos.mplace.cc">MVideo</a>
+          <a href="https://study.mplace.cc">MStudy</a>
+          <a href="https://ads.mplace.cc">M.Ads</a>
+        </nav>
+      </footer>
     </main>
   );
 }

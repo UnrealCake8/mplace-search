@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import "./search-refresh.css";
+import "./mplace-family.css";
 
 export const metadata: Metadata = {
   title: "MPlace Search",
-  description: "MPlace Search is the safety-first search engine in the MPlace family, with no AI summaries and no adult-mode switch.",
-  applicationName: "MPlace Search",
+  description: "Search the web with MPlace. Part of the MPlace family of safer, simpler web products.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

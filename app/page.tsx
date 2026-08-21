@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { MPlaceApps } from "../components/MPlaceApps";
 import { MPlaceBrand } from "../components/MPlaceBrand";
 import styles from "./home.module.css";
 
@@ -26,13 +27,15 @@ export default function HomePage() {
     <main className={styles.shell}>
       <header className={styles.topbar}>
         <nav className={styles.nav} aria-label="MPlace products">
-          <a href="/business/add">Places</a>
+          <a href="https://videos.mplace.cc">MVideo</a>
           <a href="https://pages.mplace.cc">Pages</a>
-          <a href="https://ads.mplace.cc">Ads</a>
+          <a href="https://study.mplace.cc">MStudy</a>
+          <a href="https://ads.mplace.cc">M.Ads</a>
         </nav>
         <nav className={styles.nav} aria-label="MPlace Search links">
           <a href="/submit">Add a website</a>
           <a href="/business/add">Add a business</a>
+          <MPlaceApps compact />
           <a className={styles.idButton} href="/id">MPlace ID</a>
         </nav>
       </header>
@@ -67,8 +70,9 @@ export default function HomePage() {
         <div className={styles.footerTop}>MPlace Search · Part of the MPlace family</div>
         <div className={styles.footerBottom}>
           <nav aria-label="Footer product links">
-            <a href="/business/add">Places</a>
+            <a href="https://videos.mplace.cc">MVideo</a>
             <a href="https://pages.mplace.cc">MPlace Pages</a>
+            <a href="https://study.mplace.cc">MStudy</a>
             <a href="https://ads.mplace.cc">MPlace Ads</a>
           </nav>
           <nav aria-label="Footer account links">
