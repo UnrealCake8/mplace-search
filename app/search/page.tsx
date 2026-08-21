@@ -1,3 +1,4 @@
+import { MAdsLink } from "../../components/MAdsLink";
 import { MPlaceBrand } from "../../components/MPlaceBrand";
 import { searchIndex } from "../../lib/search-index";
 import styles from "./search.module.css";
@@ -14,24 +15,27 @@ function SearchIcon() {
   );
 }
 
+function cleanLabel(value?: string) {
+  if (!value) return "";
+  const trimmed = value.trim();
+  return /^(unknown|unnamed)$/i.test(trimmed) ? "" : trimmed;
+}
+
+function cleanAddress(value?: string) {
+  if (!value) return "";
+  return value
+    .split(",")
+    .map((part) => part.trim())
+    .filter((part) => part && !/^unknown$/i.test(part) && !/^unnamed road$/i.test(part))
+    .join(", ");
+}
+
 function osmUrl(result: { latitude?: number; longitude?: number; address?: string; title: string }) {
   if (typeof result.latitude === "number" && typeof result.longitude === "number") {
     return `https://www.openstreetmap.org/?mlat=${result.latitude}&mlon=${result.longitude}#map=17/${result.latitude}/${result.longitude}`;
   }
   const search = [result.title, result.address].filter(Boolean).join(" ");
   return `https://www.openstreetmap.org/search?query=${encodeURIComponent(search)}`;
-}
-
-function cleanCategory(category?: string) {
-  const value = category?.trim();
-  if (!value || value.toLowerCase() === "unknown") return "";
-  return value;
-}
-
-function cleanAddress(address?: string) {
-  const value = address?.trim();
-  if (!value) return "";
-  return value.replace(/^Unnamed Road\s*[-–—·,]?\s*/i, "").trim();
 }
 
 export const dynamic = "force-dynamic";
@@ -73,39 +77,37 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <>
             <p className={styles.meta}>{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
             <div className={styles.resultsList}>
-              {results.map((result) => {
-                if (result.kind === "business") {
-                  const category = cleanCategory(result.category);
-                  const address = cleanAddress(result.address);
-                  const metadata = [category, address].filter(Boolean).join(" · ");
-
-                  return (
-                    <article className={`${styles.result} ${styles.placeResult}`} key={result.id}>
-                      <div className={styles.placeEyebrow}>MPlace Places</div>
-                      <a className={styles.title} href={result.url}>{result.title}</a>
-                      {metadata && <p className={styles.placeMeta}>{metadata}</p>}
-                      {result.snippet && result.snippet.trim() !== metadata && (
-                        <p className={styles.snippet}>{result.snippet}</p>
-                      )}
-                      <div className={styles.placeActions}>
-                        <a href={result.url}>Place details</a>
-                        <a href={osmUrl(result)} target="_blank" rel="noreferrer">Directions</a>
-                      </div>
-                    </article>
-                  );
-                }
-
+              {results.map((result) => result.kind === "business" ? (() => {
+                const category = cleanLabel(result.category);
+                const address = cleanAddress(result.address);
+                const meta = [category, address].filter(Boolean).join(" · ");
                 return (
                   <article className={styles.result} key={result.id}>
-                    <a className={styles.sourceRow} href={result.url}>
-                      <span className={styles.webIcon}>{result.domain.charAt(0).toUpperCase()}</span>
-                      <div><strong>{result.domain}</strong><small>{result.url}</small></div>
-                    </a>
-                    <a className={styles.title} href={result.url}>{result.title}</a>
+                    <div className={styles.placeKicker}>MPlace Places</div>
+                    <div className={styles.sourceRow}>
+                      <span className={styles.placeIcon}>{result.title.charAt(0).toUpperCase()}</span>
+                      <div>
+                        <strong>{result.title}</strong>
+                        {meta && <small>{meta}</small>}
+                      </div>
+                    </div>
                     {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
+                    <div className={styles.placeActions}>
+                      <a href={result.url}>Place details</a>
+                      <a href={osmUrl(result)} target="_blank" rel="noreferrer">Directions</a>
+                    </div>
                   </article>
                 );
-              })}
+              })() : (
+                <article className={styles.result} key={result.id}>
+                  <MAdsLink className={styles.sourceRow} href={result.url} placement="search-result-click">
+                    <span className={styles.webIcon}>{result.domain.charAt(0).toUpperCase()}</span>
+                    <div><strong>{result.domain}</strong><small>{result.url}</small></div>
+                  </MAdsLink>
+                  <MAdsLink className={styles.title} href={result.url} placement="search-result-click">{result.title}</MAdsLink>
+                  {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
+                </article>
+              ))}
             </div>
           </>
         ) : (
