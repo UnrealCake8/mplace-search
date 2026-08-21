@@ -3,19 +3,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
-  GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
   signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
-import { firebaseAuth } from "../../lib/firebase/client";
+import { firebaseAuth, googleProvider } from "../../lib/firebase/client";
 import { MPlaceApps } from "../../components/MPlaceApps";
 import { MPlaceBrand } from "../../components/MPlaceBrand";
-
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({ prompt: "select_account" });
 
 async function establishSession(user: User) {
   const idToken = await user.getIdToken();
@@ -66,7 +62,8 @@ export default function MPlaceIdPage() {
       const credential = await signInWithPopup(firebaseAuth, googleProvider);
       await finish(credential.user);
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Google sign in failed.");
+      const text = error instanceof Error ? error.message : "Google sign in failed.";
+      setMessage(text.includes("popup-closed") ? "Sign-in was cancelled." : text);
     } finally {
       setBusy(false);
     }
