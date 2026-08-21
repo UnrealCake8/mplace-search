@@ -8,6 +8,12 @@ function clean(value: unknown, max = 200) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
 
+type BusinessLocation = {
+  latitude: number;
+  longitude: number;
+  source: "manual" | "nominatim";
+};
+
 export async function POST(request: NextRequest) {
   const user = await getMPlaceUser();
   if (!user) return NextResponse.json({ error: "Sign in with MPlace ID first." }, { status: 401 });
@@ -40,8 +46,8 @@ export async function POST(request: NextRequest) {
   if (latitude !== null && (latitude < -90 || latitude > 90)) return NextResponse.json({ error: "Invalid latitude." }, { status: 400 });
   if (longitude !== null && (longitude < -180 || longitude > 180)) return NextResponse.json({ error: "Invalid longitude." }, { status: 400 });
 
-  let location = latitude !== null && longitude !== null
-    ? { latitude, longitude, source: "manual" as const }
+  let location: BusinessLocation | null = latitude !== null && longitude !== null
+    ? { latitude, longitude, source: "manual" }
     : null;
   let geocodeDisplayName: string | null = null;
 
@@ -51,7 +57,7 @@ export async function POST(request: NextRequest) {
       location = {
         latitude: geocoded.latitude,
         longitude: geocoded.longitude,
-        source: geocoded.source,
+        source: "nominatim",
       };
       geocodeDisplayName = geocoded.displayName || null;
     }
