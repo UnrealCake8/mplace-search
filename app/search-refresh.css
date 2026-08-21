@@ -1,0 +1,90 @@
+:root {
+  --search-bg: #202124;
+  --search-panel: #303134;
+  --search-panel-hover: #3c4043;
+  --search-text: #f1f3f4;
+  --search-muted: #bdc1c6;
+  --search-border: #4b4f56;
+}
+
+.home-shell {
+  background: var(--search-bg) !important;
+  color: var(--search-text) !important;
+}
+.home-shell .brand-shape { display: none !important; }
+.topbar { min-height: 58px !important; padding: 10px 24px !important; }
+.topbar a { color: var(--search-text) !important; background: transparent !important; box-shadow: none !important; font-weight: 500 !important; }
+.topbar a:hover { text-decoration: underline; }
+.id-pill { background: #34363a !important; border: 1px solid #555960 !important; box-shadow: none !important; }
+.search-home { padding: 112px 24px 64px !important; }
+.hero-kicker, .hero-copy, .feature-ribbon { display: none !important; }
+.home-brand { margin-bottom: 30px !important; }
+.home-brand .brand-logo-image { width: clamp(180px, 18vw, 250px) !important; filter: drop-shadow(0 10px 24px rgba(0,0,0,.24)); }
+.home-brand .brand-product { color: #e8eaed !important; font-size: 12px !important; letter-spacing: .24em !important; }
+.home-search-form {
+  width: min(610px, 100%) !important;
+  min-height: 48px !important;
+  border: 1px solid transparent !important;
+  border-radius: 999px !important;
+  background: #4d5156 !important;
+  box-shadow: none !important;
+  color: #e8eaed !important;
+  padding: 0 12px 0 18px !important;
+}
+.home-search-form:hover, .home-search-form:focus-within { background: #5a5f66 !important; transform: none !important; box-shadow: none !important; }
+.home-search-form input { color: white !important; font-size: 16px !important; }
+.home-search-form input::placeholder { color: #c8cdd2; }
+.home-search-form button {
+  background: transparent !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 8px 12px !important;
+}
+.home-actions { margin-top: 26px !important; gap: 10px !important; }
+.home-actions a {
+  min-height: 38px !important;
+  border: 1px solid #4b4f56 !important;
+  border-radius: 8px !important;
+  background: #303134 !important;
+  color: #e8eaed !important;
+  box-shadow: none !important;
+  font-weight: 500 !important;
+}
+.home-actions a:hover { border-color: #8a8f98 !important; }
+.home-footer { background: #171717 !important; border-top: 1px solid #3c4043 !important; color: #bdc1c6 !important; padding: 14px 24px !important; }
+.home-footer span { color: inherit !important; }
+
+.results-shell { background: var(--search-bg) !important; color: var(--search-text) !important; }
+.results-header { background: var(--search-bg) !important; }
+.results-brand .brand-logo-image { width: 96px !important; }
+.results-brand .brand-product { color: #d5d9de !important; }
+.results-search-form {
+  background: #303134 !important;
+  border: 1px solid #4b4f56 !important;
+  border-radius: 999px !important;
+  box-shadow: none !important;
+}
+.results-search-form input { color: #f1f3f4 !important; }
+.results-search-form button { color: #dfe3e7 !important; }
+.results-account-nav a { color: #e8eaed !important; }
+.results-nav-wrap { background: var(--search-bg) !important; border-bottom: 1px solid #3c4043 !important; }
+.results-nav { color: #aeb4bb !important; }
+.results-nav .active { color: #fff !important; }
+.results-content { color: #e8eaed !important; }
+.results-meta, .result-snippet, .result-source small, .notice { color: #bdc1c6 !important; }
+.result { border-bottom: 0 !important; padding-bottom: 10px !important; }
+.result-source strong { color: #e8eaed !important; }
+.result-favicon { border: 0 !important; box-shadow: none !important; background: #34373c !important; color: #fff !important; border-radius: 50% !important; }
+.result-title { color: #8ab4f8 !important; font-weight: 400 !important; }
+.place-result { padding: 18px !important; border: 1px solid #3f444b !important; border-radius: 16px !important; background: #26282c !important; }
+.place-result-label { color: #81c995 !important; font-size: 11px; text-transform: uppercase; letter-spacing: .14em; font-weight: 800; margin-bottom: 10px; }
+.result-title-static { color: #e8eaed !important; }
+.place-website-link { display: inline-block; margin-top: 10px; color: #8ab4f8 !important; font-size: 13px; }
+
+@media (max-width: 760px) {
+  .topbar { padding: 8px 12px !important; }
+  .search-home { padding-top: 82px !important; }
+  .home-brand .brand-logo-image { width: 190px !important; }
+  .results-brand .brand-logo-image { width: 84px !important; }
+}
