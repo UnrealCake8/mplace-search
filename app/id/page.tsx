@@ -2,11 +2,9 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import {
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
   signOut,
   type User,
 } from "firebase/auth";
@@ -55,19 +53,6 @@ export default function MPlaceIdPage() {
     }
   }
 
-  async function google() {
-    setBusy(true);
-    setMessage("");
-    try {
-      const credential = await signInWithPopup(firebaseAuth, new GoogleAuthProvider());
-      await finish(credential.user);
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Google sign in failed.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
   async function logout() {
     await fetch("/api/auth/session", { method: "DELETE" });
     await signOut(firebaseAuth);
@@ -83,7 +68,7 @@ export default function MPlaceIdPage() {
           <>
             <p className="eyebrow">MPlace ID</p>
             <h1>You're signed in.</h1>
-            <p className="notice">{user.displayName || user.email || "MPlace member"}</p>
+            <p className="notice">{user.email || "MPlace member"}</p>
             <div className="identity-actions">
               <a className="primary-link" href="/business/add">Add a business</a>
               <a className="secondary-link" href="/submit">Add a website</a>
@@ -94,12 +79,10 @@ export default function MPlaceIdPage() {
           <>
             <p className="eyebrow">One account for MPlace</p>
             <h1>{mode === "signin" ? "Sign in" : "Create your MPlace ID"}</h1>
-            <p className="notice">Use MPlace ID to manage websites, businesses and future MPlace services. Searching stays account-free.</p>
-            <button className="google-button" disabled={busy} onClick={google}>Continue with Google</button>
-            <div className="form-divider"><span>or</span></div>
+            <p className="notice">Use your email and password to access MPlace ID. Searching stays account-free.</p>
             <form className="stack" onSubmit={submit}>
-              <label>Email<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
-              <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required /></label>
+              <label>Email<input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></label>
+              <label>Password<input type="password" value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required autoComplete={mode === "signin" ? "current-password" : "new-password"} /></label>
               <button className="primary" disabled={busy}>{busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create ID"}</button>
             </form>
             <button className="text-button" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>{mode === "signin" ? "New to MPlace? Create an ID" : "Already have an ID? Sign in"}</button>
