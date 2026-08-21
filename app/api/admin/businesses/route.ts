@@ -2,6 +2,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { NextRequest, NextResponse } from "next/server";
 import { getMPlaceUser } from "../../../../lib/auth/session";
 import { adminDb } from "../../../../lib/firebase/admin";
+import { geocodeAddress } from "../../../../lib/geocode";
 
 function adminEmails() {
   return (process.env.MPLACE_ADMIN_EMAIL || "")
@@ -40,6 +41,7 @@ export async function GET() {
       description: data.description || null,
       ownerUid: data.ownerUid || null,
       status: data.status || "pending-review",
+      location: data.location || null,
     };
   });
 
@@ -60,17 +62,40 @@ export async function PATCH(request: NextRequest) {
   if (!existing.exists) return NextResponse.json({ error: "Business not found." }, { status: 404 });
 
   const approved = body.action === "approve";
-  await ref.update({
+  const existingData = existing.data() || {};
+  const update: Record<string, unknown> = {
     status: approved ? "approved" : "rejected",
     searchable: approved,
     reviewedAt: FieldValue.serverTimestamp(),
     reviewedBy: admin.uid,
     updatedAt: FieldValue.serverTimestamp(),
-  });
+  };
+
+  if (approved && !existingData.location) {
+    const geocoded = await geocodeAddress({
+      name: existingData.name,
+      address: existingData.address,
+      city: existingData.city,
+      country: existingData.country,
+    });
+
+    if (geocoded) {
+      update.location = {
+        latitude: geocoded.latitude,
+        longitude: geocoded.longitude,
+        source: geocoded.source,
+      };
+      update.geocodeDisplayName = geocoded.displayName || null;
+      update.geocodedAt = FieldValue.serverTimestamp();
+    }
+  }
+
+  await ref.update(update);
 
   return NextResponse.json({
     ok: true,
     status: approved ? "approved" : "rejected",
     searchable: approved,
+    geocoded: Boolean(update.location || existingData.location),
   });
 }
