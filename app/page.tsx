@@ -23,6 +23,11 @@ export default function HomePage() {
 
   return (
     <main className="home-shell">
+      <div className="brand-shape shape-green" />
+      <div className="brand-shape shape-coral" />
+      <div className="brand-shape shape-violet" />
+      <div className="brand-shape shape-cyan" />
+
       <header className="topbar">
         <nav className="topbar-left" aria-label="MPlace products">
           <a href="/business/add">Places</a>
@@ -36,7 +41,9 @@ export default function HomePage() {
       </header>
 
       <section className="search-home" aria-labelledby="mplace-title">
+        <div className="hero-kicker">THE MPLACE INDEX</div>
         <a className="home-brand" href="/" id="mplace-title"><MPlaceBrand product="Search" /></a>
+        <p className="hero-copy">Search websites and places that have been submitted to MPlace, with safety filtering built in from the start.</p>
 
         <form className="home-search-form" onSubmit={submit} role="search">
           <SearchIcon />
@@ -52,15 +59,20 @@ export default function HomePage() {
         </form>
 
         <div className="home-actions">
-          <a href="/submit">Add your website</a>
-          <a href="/business/add">Add your business</a>
+          <a className="action-green" href="/submit"><span>↗</span>Add your website</a>
+          <a className="action-gold" href="/business/add"><span>⌖</span>Add your business</a>
         </div>
 
-        <p className="home-note">A growing, safety-first index of websites and places. No AI summaries, no adult-mode switch.</p>
+        <div className="feature-ribbon" aria-label="MPlace Search principles">
+          <span><i className="dot green" />Community-submitted</span>
+          <span><i className="dot coral" />Safety-first</span>
+          <span><i className="dot violet" />No AI summaries</span>
+          <span><i className="dot cyan" />Independent index</span>
+        </div>
       </section>
 
       <footer className="home-footer">
-        <div>MPlace Search Beta</div>
+        <div><strong>MPlace Search</strong> <span>Beta</span></div>
         <nav aria-label="Footer links">
           <a href="/safety">Safety</a>
           <a href="/id">MPlace ID</a>
