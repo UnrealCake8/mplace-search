@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { MPlaceBrand } from "../../../components/MPlaceBrand";
 import { adminDb } from "../../../lib/firebase/admin";
+import styles from "./place.module.css";
 
 type PlacePageProps = { params: Promise<{ id: string }> };
 
@@ -47,27 +48,27 @@ export default async function PlacePage({ params }: PlacePageProps) {
   const mapUrl = openStreetMapUrl(name, address, latitude, longitude);
 
   return (
-    <main className="page-shell place-page-shell">
-      <header>
-        <a href="/"><MPlaceBrand compact product="Places" /></a>
-        <a href="/search">Back to Search</a>
+    <main className={styles.shell}>
+      <header className={styles.header}>
+        <a href="/" className={styles.brand}><MPlaceBrand compact product="Places" /></a>
+        <a href="/search" className={styles.back}>Back to Search</a>
       </header>
 
-      <section className="place-detail-layout">
-        <div className="place-detail-copy">
-          <p className="eyebrow">MPlace Places</p>
-          <h1 className="page-title">{name}</h1>
-          <p className="place-meta-line">{data.category || "Business"}{address ? ` · ${address}` : ""}</p>
-          {data.description && <p className="place-description">{data.description}</p>}
+      <section className={styles.layout}>
+        <div className={styles.copy}>
+          <p className={styles.eyebrow}>MPlace Places</p>
+          <h1>{name}</h1>
+          <p className={styles.meta}>{data.category || "Business"}{address ? ` · ${address}` : ""}</p>
+          {data.description && <p className={styles.description}>{data.description}</p>}
 
-          <div className="place-detail-actions">
-            {data.website && <a className="primary-link" href={data.website} target="_blank" rel="noreferrer">Website</a>}
-            {data.phone && <a className="secondary-link" href={`tel:${data.phone}`}>Call</a>}
-            <a className="secondary-link" href={mapUrl} target="_blank" rel="noreferrer">OpenStreetMap</a>
+          <div className={styles.actions}>
+            {data.website && <a className={styles.primary} href={data.website} target="_blank" rel="noreferrer">Website</a>}
+            {data.phone && <a className={styles.secondary} href={`tel:${data.phone}`}>Call</a>}
+            <a className={styles.secondary} href={mapUrl} target="_blank" rel="noreferrer">OpenStreetMap</a>
           </div>
         </div>
 
-        <div className="place-map-card">
+        <div className={styles.mapCard}>
           {typeof latitude === "number" && typeof longitude === "number" ? (
             <>
               <iframe
@@ -79,7 +80,7 @@ export default async function PlacePage({ params }: PlacePageProps) {
               <p>Map data © OpenStreetMap contributors</p>
             </>
           ) : (
-            <div className="place-map-empty">
+            <div className={styles.mapEmpty}>
               <strong>Map location not pinned yet</strong>
               <p>The listing has an address, but no latitude/longitude was supplied.</p>
               <a href={mapUrl} target="_blank" rel="noreferrer">Find it on OpenStreetMap</a>
