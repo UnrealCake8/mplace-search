@@ -1,3 +1,4 @@
+import { MPlaceBrand } from "../../components/MPlaceBrand";
 import { searchIndex } from "../../lib/search-index";
 
 type SearchPageProps = {
@@ -22,21 +23,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="results-shell">
       <header className="results-header">
-        <a className="results-brand" href="/" aria-label="MPlace Search home">
-          <span className="wordmark-symbol">M</span><span>Place</span>
-        </a>
+        <a className="results-brand" href="/" aria-label="MPlace Search home"><MPlaceBrand compact product="Search" /></a>
         <form className="results-search-form" action="/search" method="get" role="search">
-          <input name="q" defaultValue={query} aria-label="Search MPlace" placeholder="Search the web" autoComplete="off" />
+          <input name="q" defaultValue={query} aria-label="Search MPlace" placeholder="Search MPlace" autoComplete="off" />
           <button type="submit" aria-label="Search"><SearchIcon /></button>
         </form>
-        <a className="header-submit-link" href="/submit">Add a website</a>
+        <nav className="results-account-nav"><a href="/business/add">Business</a><a href="/id" className="id-pill">MPlace ID</a></nav>
       </header>
 
       <div className="results-nav-wrap">
         <nav className="results-nav" aria-label="Search categories">
           <a className="active" href={query ? `/search?q=${encodeURIComponent(query)}` : "/search"}>Web</a>
           <span aria-disabled="true">Images <small>Soon</small></span>
-          <span aria-disabled="true">Places <small>Soon</small></span>
+          <a href="/business/add">Places</a>
           <span aria-disabled="true">Pages <small>Soon</small></span>
         </nav>
       </div>
@@ -63,8 +62,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         ) : (
           <div className="empty-results">
             <p>No indexed pages matched <strong>{query}</strong>.</p>
-            <p className="notice">MPlace Search only searches sites that have been submitted and crawled. You can add a website to the index.</p>
-            <a className="header-submit-link" href="/submit">Add a website</a>
+            <p className="notice">MPlace Search only searches sites that have been submitted and crawled.</p>
+            <div className="empty-actions"><a href="/submit">Add a website</a><a href="/business/add">Add a business</a></div>
           </div>
         )}
       </section>
