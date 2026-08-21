@@ -1,4 +1,4 @@
-.shell {
+.page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -6,11 +6,11 @@
   color: #202124;
 }
 
-.topbar {
+.header {
   min-height: 64px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 8px 24px;
   font-size: 14px;
 }
@@ -142,6 +142,7 @@
 }
 
 .footer {
+  margin-top: auto;
   background: #f2f2f2;
   color: #70757a;
   font-size: 13px;
@@ -170,9 +171,7 @@
 .footer a:hover { text-decoration: underline; }
 
 @media (max-width: 700px) {
-  .topbar { padding: 8px 14px; }
-  .nav:first-child { display: none; }
-  .topbar { justify-content: flex-end; }
+  .header { padding: 8px 14px; }
   .nav { gap: 12px; }
   .nav > a:not(.idButton):nth-child(2) { display: none; }
   .main { padding: 92px 18px 52px; }
