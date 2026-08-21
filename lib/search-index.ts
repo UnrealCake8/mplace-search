@@ -46,7 +46,9 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
 
   const [pageSnapshot, businessSnapshot] = await Promise.all([
     adminDb.collection("indexedPages").where("terms", "array-contains", lookupTerm).limit(75).get(),
-    adminDb.collection("businesses").where("searchTerms", "array-contains", lookupTerm).limit(50).get(),
+    // The business collection is still small, so scan approved candidates in memory.
+    // This also makes older listings searchable even if their searchTerms field was incomplete.
+    adminDb.collection("businesses").where("searchable", "==", true).limit(200).get(),
   ]);
 
   const webResults = pageSnapshot.docs.flatMap((doc) => {
@@ -109,6 +111,10 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
     const address = [data.address, data.city, data.country].filter(Boolean).join(", ");
     const description = data.description || `${category}${address ? ` in ${address}` : ""}`;
     const searchableText = `${title} ${category} ${address} ${description}`.toLowerCase();
+
+    // Require at least one query term to match the actual business data.
+    if (!terms.some((term) => searchableText.includes(term))) return [];
+
     let score = 12;
     for (const term of terms) {
       if (title.toLowerCase() === query.toLowerCase()) score += 40;
@@ -117,9 +123,19 @@ export async function searchIndex(query: string): Promise<SearchResult[]> {
       score += Math.min(countOccurrences(searchableText, term), 6) * 2;
     }
 
-    const url = data.website || "";
-    const domain = url ? new URL(url).hostname : "MPlace Places";
-    return [{ id: `business:${doc.id}`, kind: "business" as const, url, domain, title, snippet: description, score, address, category }];
+    const website = data.website || "";
+    const domain = website ? new URL(website).hostname : "MPlace Places";
+    return [{
+      id: `business:${doc.id}`,
+      kind: "business" as const,
+      url: website || `/places/${doc.id}`,
+      domain,
+      title,
+      snippet: description,
+      score,
+      address,
+      category,
+    }];
   });
 
   return [...businessResults, ...webResults]
