@@ -38,9 +38,98 @@ export function isPermittedCrawlUrl(value: string): boolean {
   }
 }
 
+const categoryPatterns: Array<{ category: SafetyCategory; patterns: RegExp[]; hardBlock?: boolean }> = [
+  {
+    category: "adult-sexual",
+    hardBlock: true,
+    patterns: [
+      /\bporn(?:ography|ographic)?\b/i,
+      /\bxxx\b/i,
+      /\bexplicit sexual (?:video|videos|image|images|content)\b/i,
+      /\badult sex (?:video|videos|site|sites|content)\b/i,
+    ],
+  },
+  {
+    category: "exploitative-content",
+    hardBlock: true,
+    patterns: [
+      /\bchild sexual abuse material\b/i,
+      /\bcsam\b/i,
+      /\bsexual exploitation material\b/i,
+    ],
+  },
+  {
+    category: "malware-phishing",
+    hardBlock: true,
+    patterns: [
+      /\bsteal (?:your )?(?:password|credentials|login)\b/i,
+      /\bcredential phishing\b/i,
+      /\bmalware download\b/i,
+    ],
+  },
+  {
+    category: "self-harm-promotion",
+    patterns: [
+      /\b(?:encourage|promote|instructions? for) self[- ]harm\b/i,
+      /\bhow to (?:kill yourself|commit suicide)\b/i,
+    ],
+  },
+  {
+    category: "graphic-violence",
+    patterns: [
+      /\bgraphic gore\b/i,
+      /\bgore videos?\b/i,
+      /\breal death videos?\b/i,
+    ],
+  },
+  {
+    category: "illegal-marketplace",
+    patterns: [
+      /\bbuy stolen (?:cards|accounts|credentials)\b/i,
+      /\billegal marketplace\b/i,
+    ],
+  },
+  {
+    category: "extremist-recruitment",
+    patterns: [
+      /\bjoin (?:our )?(?:terrorist|extremist) (?:group|movement)\b/i,
+      /\bextremist recruitment\b/i,
+    ],
+  },
+  {
+    category: "spam-deception",
+    patterns: [
+      /\bguaranteed free money\b/i,
+      /\bclick here to claim your prize\b/i,
+    ],
+  },
+];
+
+const legitimateContext = /\b(?:medical|medicine|health|education|educational|history|historical|news|reporting|research|prevention|safety|awareness|support|treatment|documentary)\b/i;
+
+export function assessPageSafety(text: string): SafetyAssessment {
+  const sample = text.slice(0, 120_000);
+  const matches = categoryPatterns.filter((entry) => entry.patterns.some((pattern) => pattern.test(sample)));
+  const categories = matches.map((entry) => entry.category);
+
+  if (!categories.length) {
+    return { decision: "allow", categories: [], reason: "No blocked-content signals detected." };
+  }
+
+  if (matches.some((entry) => entry.hardBlock)) {
+    return { decision: "block", categories, reason: "Content matches a category MPlace does not index." };
+  }
+
+  if (legitimateContext.test(sample)) {
+    return { decision: "review", categories, reason: "Sensitive content appears in a potentially legitimate context and requires review." };
+  }
+
+  return { decision: "block", categories, reason: "Sensitive content matched MPlace indexing restrictions." };
+}
+
 export const safetyPolicy = {
   universal: true,
-  disableSwitch: false,
+  disableSwitch: true,
   block: [
     "Pornography and explicit sexual content",
     "Graphic gore whose primary purpose is shock or entertainment",

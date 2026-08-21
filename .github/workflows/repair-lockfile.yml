@@ -1,0 +1,55 @@
+name: Repair lockfile and verify build
+
+on:
+  push:
+    branches:
+      - feat/firebase-id-and-index-foundation
+    paths:
+      - package.json
+      - package-lock.json
+      - .github/workflows/repair-lockfile.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+        with:
+          ref: feat/firebase-id-and-index-foundation
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Regenerate package-lock
+        run: npm install --package-lock-only --ignore-scripts
+
+      - name: Clean install
+        run: npm ci
+
+      - name: Show dependency path
+        run: |
+          npm ls jwks-rsa jose firebase-admin firebase || true
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit repaired lockfile if changed
+        run: |
+          if git diff --quiet -- package-lock.json; then
+            echo "package-lock.json already synchronized"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package-lock.json
+          git commit -m "Repair npm lockfile [skip ci]"
+          git push origin HEAD:feat/firebase-id-and-index-foundation
