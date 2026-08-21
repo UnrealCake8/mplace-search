@@ -22,6 +22,18 @@ function osmUrl(result: { latitude?: number; longitude?: number; address?: strin
   return `https://www.openstreetmap.org/search?query=${encodeURIComponent(search)}`;
 }
 
+function cleanCategory(category?: string) {
+  const value = category?.trim();
+  if (!value || value.toLowerCase() === "unknown") return "";
+  return value;
+}
+
+function cleanAddress(address?: string) {
+  const value = address?.trim();
+  if (!value) return "";
+  return value.replace(/^Unnamed Road\s*[-–—·,]?\s*/i, "").trim();
+}
+
 export const dynamic = "force-dynamic";
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -61,32 +73,39 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           <>
             <p className={styles.meta}>{results.length} result{results.length === 1 ? "" : "s"} for <strong>{query}</strong></p>
             <div className={styles.resultsList}>
-              {results.map((result) => result.kind === "business" ? (
-                <article className={styles.result} key={result.id}>
-                  <div className={styles.sourceRow}>
-                    <span className={styles.placeIcon}>{result.title.charAt(0).toUpperCase()}</span>
-                    <div>
-                      <strong>{result.title}</strong>
-                      <small>{result.category || "Business"}{result.address ? ` · ${result.address}` : ""}</small>
-                    </div>
-                  </div>
-                  <a className={styles.title} href={result.url}>{result.title}</a>
-                  {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
-                  <div className={styles.placeActions}>
-                    <a href={result.url}>Place details</a>
-                    <a href={osmUrl(result)} target="_blank" rel="noreferrer">OpenStreetMap</a>
-                  </div>
-                </article>
-              ) : (
-                <article className={styles.result} key={result.id}>
-                  <a className={styles.sourceRow} href={result.url}>
-                    <span className={styles.webIcon}>{result.domain.charAt(0).toUpperCase()}</span>
-                    <div><strong>{result.domain}</strong><small>{result.url}</small></div>
-                  </a>
-                  <a className={styles.title} href={result.url}>{result.title}</a>
-                  {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
-                </article>
-              ))}
+              {results.map((result) => {
+                if (result.kind === "business") {
+                  const category = cleanCategory(result.category);
+                  const address = cleanAddress(result.address);
+                  const metadata = [category, address].filter(Boolean).join(" · ");
+
+                  return (
+                    <article className={`${styles.result} ${styles.placeResult}`} key={result.id}>
+                      <div className={styles.placeEyebrow}>MPlace Places</div>
+                      <a className={styles.title} href={result.url}>{result.title}</a>
+                      {metadata && <p className={styles.placeMeta}>{metadata}</p>}
+                      {result.snippet && result.snippet.trim() !== metadata && (
+                        <p className={styles.snippet}>{result.snippet}</p>
+                      )}
+                      <div className={styles.placeActions}>
+                        <a href={result.url}>Place details</a>
+                        <a href={osmUrl(result)} target="_blank" rel="noreferrer">Directions</a>
+                      </div>
+                    </article>
+                  );
+                }
+
+                return (
+                  <article className={styles.result} key={result.id}>
+                    <a className={styles.sourceRow} href={result.url}>
+                      <span className={styles.webIcon}>{result.domain.charAt(0).toUpperCase()}</span>
+                      <div><strong>{result.domain}</strong><small>{result.url}</small></div>
+                    </a>
+                    <a className={styles.title} href={result.url}>{result.title}</a>
+                    {result.snippet && <p className={styles.snippet}>{result.snippet}</p>}
+                  </article>
+                );
+              })}
             </div>
           </>
         ) : (
