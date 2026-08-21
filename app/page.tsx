@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { MPlaceBrand } from "../components/MPlaceBrand";
+import styles from "./home.module.css";
 
 function SearchIcon() {
   return (
@@ -22,30 +23,25 @@ export default function HomePage() {
   }
 
   return (
-    <main className="home-shell">
-      <div className="brand-shape shape-green" />
-      <div className="brand-shape shape-coral" />
-      <div className="brand-shape shape-violet" />
-      <div className="brand-shape shape-cyan" />
-
-      <header className="topbar">
-        <nav className="topbar-left" aria-label="MPlace products">
+    <main className={styles.shell}>
+      <header className={styles.topbar}>
+        <nav className={styles.nav} aria-label="MPlace products">
           <a href="/business/add">Places</a>
           <a href="https://pages.mplace.cc">Pages</a>
         </nav>
-        <nav className="topbar-right" aria-label="MPlace Search links">
+        <nav className={styles.nav} aria-label="MPlace Search links">
           <a href="/submit">Add a website</a>
           <a href="/business/add">Add a business</a>
-          <a className="id-pill" href="/id">MPlace ID</a>
+          <a className={styles.idButton} href="/id">MPlace ID</a>
         </nav>
       </header>
 
-      <section className="search-home" aria-labelledby="mplace-title">
-        <div className="hero-kicker">THE MPLACE INDEX</div>
-        <a className="home-brand" href="/" id="mplace-title"><MPlaceBrand product="Search" /></a>
-        <p className="hero-copy">Search websites and places that have been submitted to MPlace, with safety filtering built in from the start.</p>
+      <section className={styles.main} aria-labelledby="mplace-title">
+        <a className={styles.homeBrand} href="/" id="mplace-title">
+          <MPlaceBrand product="Search" />
+        </a>
 
-        <form className="home-search-form" onSubmit={submit} role="search">
+        <form className={styles.searchForm} onSubmit={submit} role="search">
           <SearchIcon />
           <input
             aria-label="Search MPlace"
@@ -58,26 +54,28 @@ export default function HomePage() {
           <button type="submit" aria-label="Search">Search</button>
         </form>
 
-        <div className="home-actions">
-          <a className="action-green" href="/submit"><span>↗</span>Add your website</a>
-          <a className="action-gold" href="/business/add"><span>⌖</span>Add your business</a>
+        <div className={styles.actions}>
+          <a href="/submit">Add your website</a>
+          <a href="/business/add">Add your business</a>
         </div>
 
-        <div className="feature-ribbon" aria-label="MPlace Search principles">
-          <span><i className="dot green" />Community-submitted</span>
-          <span><i className="dot coral" />Safety-first</span>
-          <span><i className="dot violet" />No AI summaries</span>
-          <span><i className="dot cyan" />Independent index</span>
-        </div>
+        <p className={styles.note}><strong>Safety filtering is always on.</strong> Search submitted websites and approved places without AI summaries.</p>
       </section>
 
-      <footer className="home-footer">
-        <div><strong>MPlace Search</strong> <span>Beta</span></div>
-        <nav aria-label="Footer links">
-          <a href="/safety">Safety</a>
-          <a href="/id">MPlace ID</a>
-          <a href="https://mplace.cc">MPlace</a>
-        </nav>
+      <footer className={styles.footer}>
+        <div className={styles.footerTop}>MPlace Search Beta</div>
+        <div className={styles.footerBottom}>
+          <nav aria-label="Footer product links">
+            <a href="/business/add">Places</a>
+            <a href="/submit">Websites</a>
+            <a href="/safety">How Search works</a>
+          </nav>
+          <nav aria-label="Footer account links">
+            <a href="/safety">Safety</a>
+            <a href="/id">MPlace ID</a>
+            <a href="https://mplace.cc">MPlace</a>
+          </nav>
+        </div>
       </footer>
     </main>
   );
